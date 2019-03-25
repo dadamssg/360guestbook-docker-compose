@@ -1,0 +1,48 @@
+version: '3'
+
+networks:
+  web-network:
+
+services:
+  nginx:
+    build: 
+      context: ./docker/nginx
+    ports:
+      - "8080:80"
+    tty: true
+    volumes:
+      - ./backend:/var/www/360guestbook/backend
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - web-network
+
+  php-fpm:
+    build: 
+      context: ./docker/php-fpm
+    tty: true
+    volumes:
+      - ./backend:/var/www/360guestbook/backend:cached
+    working_dir: /var/www/360guestbook/backend
+    networks:
+      - web-network
+  
+  postgres:
+    image: postgres 
+    tty: true
+    volumes:
+      - ./app-db:/var/lib/postgresql/data
+      - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432  
+    environment:
+      - POSTGRES_PASSWORD=secret  
+    networks:
+      - web-network     
+      
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8089:8080     
+    networks:
+      - web-network      
