@@ -13,5 +13,6 @@ class FirstControllerTest extends WebTestCase
         $json = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertGreaterThan(-1, $json['number']);
+        $this->assertFalse(true);
     }
 }
